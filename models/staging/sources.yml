@@ -1,0 +1,120 @@
+version: 2 
+
+sources:
+  - name: olist_raw
+    description: " Raw Olist Brazilian e-commerce data loaded from Kaggle into BigQuery."
+    database: "{{ target.database }}"
+    schema: olist_raw
+    tags: ["olist","raw"]
+
+    tables:
+      - name: orders
+        description: "One row per order. Central fact table linking customers to order lifecycle."
+        freshness:
+          warn_after: {count: 7, period: day}
+          error_after: {count: 30, period: day}
+        loaded_at_field: order_purchase_timestamp
+        columns:
+          - name: order_id
+            description: "Unique order identifier."
+            tests:
+              - unique
+              - not_null
+          - name: customer_id
+            description: "Foreign key to customers table."
+            tests: 
+              - not_null
+              - relationships:
+                  to: source('olist_raw','customers')
+                  field: customer_id
+          - name: order_status
+            description: "Order lifecycle status (delivered, shipped, canceled etc.)"
+            tests:
+              - not_null
+              - accepted_values:
+                  values: ['delivered','shipped','canceled','unavailable','invoiced','processing','created','approved']
+
+      - name: order_items
+        description: "One row per item within an order. Contains price and freight."
+        columns:
+          - name: order_id 
+            tests: 
+              - not_null
+              - relationships:
+                  to: source('olist_raw', 'orders')
+                  field: order_id
+          - name: product_id 
+            tests: 
+              - not_null
+              - relationships:
+                  to: source('olist_raw','products')
+                  field: product_id
+          - name: price 
+            tests: 
+              - not_null
+          - name: seller_id
+            tests: 
+              - not_null
+              - relationships:
+                  to: source('olist_raw','sellers')
+                  field: seller_id
+
+      - name: order_payments
+        description: "Payment transactions per order. One order can have multiple payment methods."
+        columns: 
+          - name: order_id 
+            tests: 
+              - not_null
+              - relationships:
+                  to: source('olist_raw','orders')
+                  field: order_id
+          - name: payment_value
+            tests:  
+              - not_null
+          - name: payment_type
+            tests: 
+              - accepted_values:
+                  values: ['credit card','boleto','voucher','debit_card','not_defined']
+                
+      - name: order_reviews
+        description: "Customer reviews per order. Contains free text comments in Portuguese."
+        columns:
+          - name: order_id
+            tests:
+              - not_null
+              - relationships:
+                  to: source('olist_raw','orders')
+                  field: order_id
+
+      - name: customers
+        description: "Customer dimension. One row per customer_id."
+        columns:
+          - name: customer_id
+            tests:
+              - unique
+              - not_null
+
+      - name: products
+        description: "Product dimension with category and physical attributes."
+        columns: 
+          - name: product_id
+            tests:
+              - unique
+              - not_null
+            
+      - name: sellers
+        description: "Seller dimension with location data."
+        columns: 
+          - name: seller_id
+            tests:
+              - unique
+              - not_null
+
+      - name: geolocation
+        description: " ZIP code to lat/long mapping. Can have multiple rows per ZIP."
+
+      - name: product_category_name_translation
+        description: "Maps Portuguese product category names to English."
+
+
+  
