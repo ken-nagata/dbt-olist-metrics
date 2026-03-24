@@ -83,7 +83,7 @@ sources:
             tests: 
               - accepted_values:
                   arguments:
-                    values: ['credit card','boleto','voucher','debit_card','not_defined']
+                    values: ['credit_card','boleto','voucher','debit_card','not_defined']
                 
       - name: order_reviews
         description: "Customer reviews per order. Contains free text comments in Portuguese."
