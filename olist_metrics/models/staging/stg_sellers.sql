@@ -4,9 +4,9 @@ with source as (
 renamed as (
     select 
         seller_id,
-        seller_zip_code_prefix,
-        seller_city,
-        seller_state
+        cast(seller_zip_code_prefix as string) as seller_zip_code_prefix,
+        lower(seller_city)                     as seller_city,
+        lower(seller_state)                    as seller_state
     from source
 )
 select * from renamed 

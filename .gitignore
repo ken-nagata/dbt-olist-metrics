@@ -16,3 +16,6 @@ olist_metrics/logs/
 # data
 data/
 logs/
+
+# OS
+.DS_Store

@@ -1,13 +1,13 @@
 with source as (
-    select * from {{ source('olist_raw','order_payments') }}
+    select * from {{ source('olist_raw', 'order_payments') }}
 ),
 renamed as (
     select 
         order_id,
-        payment_sequential,
+        cast(payment_sequential as int64)                   as payment_sequential,
         payment_type,
-        payment_installments,
-        payment_value
+        cast(payment_installments as int64)                 as payment_installments,
+        round(cast(payment_value as numeric),2 )            as payment_value
     from source
 )
 select * from renamed

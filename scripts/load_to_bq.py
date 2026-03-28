@@ -23,6 +23,13 @@ TABLES = {
     "product_category_name_translation":"product_category_name_translation.csv"
 }
 
+EXPLICIT_SCHEMAS = {
+    "product_category_name_translation": [
+        bigquery.SchemaField("product_category_name","STRING"),
+        bigquery.SchemaField("product_category_name_english","STRING"),
+    ]
+}
+
 def load_to_bigquery(data_dir : Path) -> None:
     client = bigquery.Client(project=PROJECT_ID)
     dataset_ref = bigquery.Dataset(f"{PROJECT_ID}.{DATASET_ID}")
@@ -34,9 +41,12 @@ def load_to_bigquery(data_dir : Path) -> None:
         if not filepath.exists():
             print(f"WARNING: {filename} not found, skipping.")
             continue
+        # product category name table columns are not autodetected
+        schema = EXPLICIT_SCHEMAS.get(table_name)
 
         job_config = bigquery.LoadJobConfig(
-            autodetect=True,
+            schema=schema,
+            autodetect=schema is None,
             skip_leading_rows=1,
             source_format=bigquery.SourceFormat.CSV,
             write_disposition="WRITE_TRUNCATE",

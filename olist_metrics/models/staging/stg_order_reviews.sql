@@ -8,8 +8,8 @@ renamed as (
         review_score,
         review_comment_title,
         review_comment_message,
-        review_creation_date,
-        review_answer_timestamp
+        datetime(review_creation_date, 'America/Sao_Paulo')         as review_creation_date,
+        datetime(review_answer_timestamp, 'America/Sao_Paulo')      as review_answer_timestamp
     from source
 )
 select * from renamed

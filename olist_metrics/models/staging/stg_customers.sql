@@ -5,9 +5,9 @@ renamed as (
     select
         customer_id,
         customer_unique_id,
-        customer_zip_code_prefix,
-        customer_city,
-        customer_state
+        cast(customer_zip_code_prefix as string) as customer_zip_code_prefix,
+        lower(customer_city)                     as customer_city,
+        lower(customer_state)                    as customer_state
     from source
 )
 select * from renamed
