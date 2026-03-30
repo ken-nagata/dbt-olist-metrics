@@ -21,4 +21,15 @@ models:
     intermediate:
       +materialized: view
     marts:
-      +materialized: table 
+      core:
+        +materialized: table 
+      finance:
+        +materialized: table
+      marketing:
+        +materialized: table
+      operations:
+        +materialized: table 
+      product:
+        +materialized: table 
+      ml:
+        +materialized: table 
