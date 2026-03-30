@@ -10,7 +10,7 @@ orders_with_reviews as (
 customers as (
     select * from {{ ref('stg_customers') }}
 ),
-final as (
+joined as (
     select 
         -- order keys 
         orders_with_payments.order_id,
@@ -45,7 +45,7 @@ final as (
         orders_with_items.earliest_shipping_limit_date,
 
         -- review info 
-        orders_with_reviews.review_count,
+        coalesce(orders_with_reviews.review_count, 0)               as  review_count, 
         orders_with_reviews.avg_review_score,
         orders_with_reviews.min_review_score,
         orders_with_reviews.max_review_score,
@@ -79,5 +79,17 @@ final as (
         using (order_id)
     left join customers 
         using (customer_id)
+),
+final as (
+    select 
+        *,
+        case
+            when delivery_delay_days < 0  then 'early'
+            when delivery_delay_days = 0  then 'on_time'
+            when delivery_delay_days > 0  then 'late'
+            else 'unknown'
+        end                                                          as delivery_status
+    from joined
 )
-    select * from final
+
+select * from final
