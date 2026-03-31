@@ -15,7 +15,8 @@ final as (
         products.product_weight_g,
         products.product_length_cm,
         products.product_height_cm,
-        products.product_width_cm
+        products.product_width_cm,
+        products.product_length_cm * products.product_height_cm * products.product_width_cm   as product_volume_cm3
     from products 
     left join category_translations
         using (product_category_name)
