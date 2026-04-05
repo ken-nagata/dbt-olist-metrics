@@ -59,6 +59,7 @@ seller_metrics as (
         using (order_id)
     inner join sellers
         using (seller_id)
+    where orders.order_status != 'canceled'
     group by
         order_items.seller_id,
         sellers.seller_city,

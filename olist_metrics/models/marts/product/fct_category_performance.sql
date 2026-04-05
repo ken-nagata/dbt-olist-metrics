@@ -41,6 +41,7 @@ category_metrics as (
         using (order_id)
     inner join products 
         using (product_id)
+    where orders.order_status != 'canceled'
     group by 1, 2, 3
 )
 
