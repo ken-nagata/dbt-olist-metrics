@@ -40,8 +40,6 @@ final as (
         customers.avg_review_score,
         customers.is_repeat_customer,
         rfm.recency_days,
-        rfm.frequency,
-        rfm.monetary,
         rfm.recency_score,
         rfm.frequency_score,
         rfm.monetary_score,
