@@ -1,0 +1,69 @@
+version: 2 
+
+models: 
+  - name: fct_orders 
+    description: "Central fact table. One row per order with payment, item, review and delivery metrics."
+    columns: 
+      - name: order_id
+        description: "Unique order identifier."
+        tests: 
+          - unique
+          - not_null
+      - name: customer_id
+        description: "True customer identifier (customer_unique_id from raw)."
+        tests: 
+          - not_null 
+      - name: order_status 
+        description: "Order lifecycle status"
+        tests: 
+          - not_null
+          - accepted_values:
+              arguments: 
+                values: ['delivered','shipped','canceled','unavailable','invoiced','processing','created','approved']
+      - name: total_payment_value
+        description: "Total payment value across all payment methods."
+        tests:
+          - not_null:
+              arguments:
+                where: "order_status = 'delivered'"
+              config:
+                severity: warn
+      - name: item_count
+        description: "Total number of items in the order."
+        tests:
+          - not_null:
+              arguments:
+                where: "order_status = 'delivered'"
+              config:
+                severity: warn
+      - name: delivery_status 
+        description: "Derived delivery status: early, on_time, late or unknown."
+        tests:
+          - accepted_values:
+              arguments: 
+                values: ['early','on_time','late','unknown']
+
+  - name: dim_customers 
+    description: "Customer dimension with RFM-based segmentation. One row per customer."
+    columns: 
+      - name: customer_id
+        description: "True customer identifier (customer_unique_id from raw)."
+        tests: 
+          - unique 
+          - not_null 
+      - name: customer_segment 
+        description: "RFM-derived customer segment."
+        tests: 
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['champions','loyal','potential_loyalist','new_customer','promising','needs_attention','at_risk','cant_lose_them','frequent_low_spender','hibernating','lost']
+
+  - name: dim_products
+    description: "Product dimension with category translations and physical attributes. One row per product."
+    columns:
+      - name: product_id
+        description: "Unique product identifier."
+        tests: 
+          - unique
+          - not_null
