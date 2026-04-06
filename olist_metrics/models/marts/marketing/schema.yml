@@ -1,0 +1,34 @@
+version: 2
+
+models:
+  - name: fct_customer_orders
+    description: "Customer-level order history with RFM scores. One row per customer."
+    columns:
+      - name: customer_id
+        description: "True customer identifier."
+        tests:
+          - unique
+          - not_null
+      - name: order_count
+        description: "Total number of orders placed by the customer."
+        tests:
+          - not_null
+      - name: total_spend
+        description: "Total amount spent by the customer in BRL."
+        tests:
+          - not_null:
+              config:
+                severity: warn
+      - name: is_repeat_customer
+        description: "True if the customer has placed more than one order."
+        tests:
+          - not_null
+
+  - name: fct_cac_payback
+    description: "Monthly CAC and payback period using synthetic marketing spend data. One row per month."
+    columns:
+      - name: order_month
+        description: "Month of customer acquisition."
+        tests:
+          - unique
+          - not_null

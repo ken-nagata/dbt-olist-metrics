@@ -1,0 +1,75 @@
+version: 2
+
+models:
+  - name: fct_customer_features
+    description: "Customer-level feature store for churn and LTV prediction. One row per customer."
+    columns:
+      - name: customer_id
+        description: "True customer identifier."
+        tests:
+          - unique
+          - not_null
+      - name: order_count
+        description: "Total number of orders placed by the customer."
+        tests:
+          - not_null
+      - name: total_spend
+        description: "Total amount spent by the customer in BRL."
+        tests:
+          - not_null:
+              config:
+                severity: warn
+      - name: is_repeat_customer
+        description: "True if the customer has placed more than one order."
+        tests:
+          - not_null
+      - name: recency_days
+        description: "Days since last order relative to dataset max date."
+        tests:
+          - not_null
+
+  - name: fct_order_features
+    description: "Order-level feature store for delivery delay prediction. Delivered orders only. One row per order."
+    columns:
+      - name: order_id
+        description: "Unique order identifier."
+        tests:
+          - unique
+          - not_null
+      - name: customer_id
+        description: "True customer identifier."
+        tests:
+          - not_null
+      - name: is_late_delivery
+        description: "Target variable - true if order was delivered after estimated date."
+        tests:
+          - not_null:
+              config:
+                severity: warn
+      - name: actual_delivery_days
+        description: "Target variable - actual number of days from purchase to delivery."
+        tests:
+          - not_null:
+              config:
+                severity: warn
+
+  - name: fct_product_features
+    description: "Product-level feature store for recommendation and price optimization. One row per product."
+    columns:
+      - name: product_id
+        description: "Unique product identifier."
+        tests:
+          - unique
+          - not_null
+      - name: total_orders
+        description: "Total number of orders containing this product."
+        tests:
+          - not_null:
+              config:
+                severity: warn
+      - name: avg_selling_price
+        description: "Average selling price of the product in BRL."
+        tests:
+          - not_null:
+              config:
+                severity: warn

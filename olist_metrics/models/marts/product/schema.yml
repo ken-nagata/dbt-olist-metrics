@@ -1,0 +1,52 @@
+version: 2
+
+models:
+  - name: fct_category_performance
+    description: "Revenue, volume and delivery metrics by product category and month. One row per category per month."
+    columns:
+      - name: product_category_name_english
+        description: "English product category name."
+        tests:
+          - not_null:
+              config:
+                severity: warn
+      - name: order_month
+        description: "Month of activity."
+        tests:
+          - not_null
+      - name: total_revenue
+        description: "Total revenue for the category in BRL."
+        tests:
+          - not_null:
+              config:
+                severity: warn
+
+  - name: fct_order_reviews
+    description: "Order-level review metrics by month and customer state. Delivered orders only."
+    columns:
+      - name: order_month
+        description: "Month of order purchase."
+        tests:
+          - not_null
+      - name: review_count
+        description: "Total number of reviews."
+        tests:
+          - not_null
+
+  - name: fct_product_reviews
+    description: "Product-level review metrics. Restricted to single-product orders only due to Olist order-level review system."
+    columns:
+      - name: product_id
+        description: "Unique product identifier."
+        tests:
+          - not_null
+      - name: product_category_name_english
+        description: "English product category name."
+        tests:
+          - not_null:
+              config:
+                severity: warn
+      - name: review_count
+        description: "Total number of reviews for the product."
+        tests:
+          - not_null

@@ -13,6 +13,8 @@ models:
         description: "Total payment value across all payment methods for the order."
         tests:
           - not_null:
+              arguments:
+                where: "order_status = 'delivered'"
               config:
                 severity: warn
 

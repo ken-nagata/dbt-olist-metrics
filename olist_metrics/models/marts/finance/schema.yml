@@ -1,0 +1,44 @@
+version: 2 
+
+models: 
+  - name: fct_revenue 
+    description: "Order-level revenue fact table excluding canceled orders. One row per order."
+    columns:
+      - name: order_id
+        description: "Unique order identifier."
+        tests:
+          - unique
+          - not_null
+      - name: customer_id
+        description: "True customer identifier."
+        tests:
+          - not_null
+      - name: gmv
+        description: "Gross Merchandise Value - total payment value for the order."
+        tests:
+          - not_null:
+              arguments: 
+                where: "order_status = 'delivered'"
+              config:
+                severity: warn
+
+  - name: fct_payments
+    description: "Payment transaction fact table. One row per payment transaction."
+    columns: 
+      - name: order_id
+        description: "Order identifier."
+        tests:
+          - not_null 
+      - name: payment_type
+        description: "Payment method used."
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['credit_card','boleto','voucher','debit_card','not_defined']
+      - name: payment_value 
+        description: "Payment amount in BRL."
+        tests:
+          - not_null:
+              config:
+                severity: warn 
