@@ -1,0 +1,81 @@
+version: 2
+
+models:
+  - name: int_orders_with_payments
+    description: "Orders enriched with aggregated payment info. One row per order."
+    columns:
+      - name: order_id
+        description: "Unique order identifier."
+        tests:
+          - unique
+          - not_null
+      - name: total_payment_value
+        description: "Total payment value across all payment methods for the order."
+        tests:
+          - not_null:
+              config:
+                severity: warn
+
+
+  - name: int_orders_with_items
+    description: "Order-level aggregation of item quantities, prices and shipping values. One row per order."
+    columns:
+      - name: order_id
+        description: "Unique order identifier."
+        tests:
+          - unique
+          - not_null
+      - name: item_count
+        description: "Total number of items in the order."
+        tests:
+          - not_null
+      - name: total_order_value
+        description: "Sum of item prices and shipping values for the order."
+        tests:
+          - not_null
+
+  - name: int_orders_with_reviews
+    description: "Order-level aggregation of review scores. One row per order."
+    columns:
+      - name: order_id
+        description: "Unique order identifier."
+        tests:
+          - unique
+          - not_null
+
+  - name: int_orders_enriched
+    description: "Central intermediate model joining orders, payments, items, reviews and customers into one order-level table. One row per order."
+    columns:
+      - name: order_id
+        description: "Unique order identifier."
+        tests:
+          - unique
+          - not_null
+      - name: customer_id
+        description: "True customer identifier (customer_unique_id from raw). Replaces Olist's per-order surrogate customer_id."
+        tests:
+          - not_null
+      - name: delivery_status
+        description: "Derived delivery status based on delivery_delay_days."
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['early', 'on_time', 'late', 'unknown']
+
+  - name: int_customers_with_orders
+    description: "Customer-level aggregation of order history. One row per customer_unique_id."
+    columns:
+      - name: customer_id
+        description: "True customer identifier (customer_unique_id from raw)."
+        tests:
+          - unique
+          - not_null
+
+  - name: int_products_with_category
+    description: "Products joined with English category translations. One row per product."
+    columns:
+      - name: product_id
+        description: "Unique product identifier."
+        tests:
+          - unique
+          - not_null
