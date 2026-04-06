@@ -14,7 +14,8 @@ joined as (
     select 
         -- order keys 
         orders_with_payments.order_id,
-        customers.customer_unique_id as customer_id, -- replace customer_id with customer_unique_id as the true identifier
+        orders_with_payments.customer_id,                       --- surrogate for joins
+        customers.customer_unique_id,                           --- true customer identifier
         customers.customer_zip_code_prefix,
         customers.customer_city,
         customers.customer_state,

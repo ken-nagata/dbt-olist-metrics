@@ -8,10 +8,10 @@ orders as (
 
 customer_orders as (
     select 
-        orders.customer_id,
-        orders.customer_city,
-        orders.customer_state,
-        orders.customer_zip_code_prefix,
+        orders.customer_unique_id                              as customer_id,  
+        max(orders.customer_city)                              as customer_city,
+        max(orders.customer_state)                             as customer_state,
+        max(orders.customer_zip_code_prefix)                   as customer_zip_code_prefix,
         count(orders.order_id)                                 as order_count,
         min(orders.order_purchase_timestamp)                   as first_order_date,
         max(orders.order_purchase_timestamp)                   as last_order_date,
@@ -24,10 +24,8 @@ customer_orders as (
     left join reviews 
         using (order_id)
     group by 
-        orders.customer_id,
-        orders.customer_city,
-        orders.customer_state,
-        orders.customer_zip_code_prefix
+        orders.customer_unique_id
+
 )
 
 select * from customer_orders 
