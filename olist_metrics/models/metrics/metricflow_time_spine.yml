@@ -1,0 +1,9 @@
+models:
+  - name: metricflow_time_spine
+    description: "Time spine model required by MetricFlow for date-based metric calculations."
+    columns:
+      - name: date_day
+        description: "Daily date column for MetricFlow time spine."
+        granularity: day
+    time_spine:
+      standard_granularity_column: date_day

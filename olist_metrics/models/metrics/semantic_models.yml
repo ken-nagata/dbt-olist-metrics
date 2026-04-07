@@ -1,0 +1,98 @@
+semantic_models:
+  - name: orders
+    description: "Order-level semantic model for revenue and conversion metrics."
+    model: ref('fct_orders')
+    defaults:
+      agg_time_dimension: order_purchase_timestamp
+
+    entities: 
+      - name: order 
+        type: primary
+        expr: order_id
+      - name: customer
+        type: foreign
+        expr: customer_id
+
+    dimensions: 
+      - name: order_purchase_timestamp
+        type: time 
+        type_params: 
+          time_granularity: day
+      - name: order_status
+        type: categorical
+      - name: delivery_status
+        type: categorical
+      - name: customer_state
+        type: categorical 
+      - name: is_delivered 
+        type: categorical 
+      - name: is_late_delivery
+        type: categorical 
+
+    measures: 
+      - name: order_count
+        description: "Total number of orders."
+        agg: count 
+        expr: order_id 
+      - name: gmv 
+        description: "Gross Merchandise Value."
+        agg: sum 
+        expr: total_payment_value
+      - name: avg_order_value
+        description: "Average order value."
+        agg: average
+        expr: total_payment_value
+      - name: total_items
+        description: "Total number of items ordered."
+        agg: sum
+        expr: item_count
+
+  - name: customers 
+    description: "Customer-level semantic model for retention and segmentation metrics."
+    model: ref('fct_customer_orders')
+    defaults: 
+      agg_time_dimension: first_order_date
+
+    entities: 
+      - name: customer
+        type: primary
+        expr: customer_id 
+
+    dimensions: 
+      - name: first_order_date
+        type: time
+        type_params:
+          time_granularity: day
+      - name: is_repeat_customer
+        type: categorical 
+
+    measures:
+      - name: customer_count 
+        description: "Total number of customers."
+        agg: count 
+        expr: customer_id
+      - name: repeat_customer_count
+        description: "Number of repeat customers."
+        agg: count_distinct 
+        expr: case when is_repeat_customer then customer_id end 
+      - name: total_revenue_per_customer 
+        description: "Total revenue per customer."
+        agg: sum 
+        expr: total_spend
+
+
+  - name: customer_dimensions
+    description: "Customer dimension semantic model for segmentation."
+    model: ref('dim_customers')
+
+    entities:
+      - name: customer 
+        type: primary 
+        expr: customer_id 
+
+    dimensions:
+      - name: customer_segment
+        type: categorical
+      - name: customer_state 
+        type: categorical 
+        

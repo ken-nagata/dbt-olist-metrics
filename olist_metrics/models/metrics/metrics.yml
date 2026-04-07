@@ -1,0 +1,64 @@
+metrics:
+  - name: gmv
+    label: "GMV"
+    description: "Gross Merchandise Value - total payment value across all non-canceled orders."
+    type: simple
+    type_params:
+      measure:
+        name: gmv
+
+  - name: order_count
+    label: "Order Count"
+    description: "Total number of orders placed."
+    type: simple
+    type_params:
+      measure:
+        name: order_count
+
+  - name: avg_order_value
+    label: "Average Order Value"
+    description: "Average order value in BRL."
+    type: simple
+    type_params:
+      measure:
+        name: avg_order_value
+
+  - name: customer_count
+    label: "Customer Count"
+    description: "Total number of customers."
+    type: simple
+    type_params:
+      measure:
+        name: customer_count
+
+  - name: repeat_customer_count
+    label: "Repeat Customer Count"
+    description: "Number of customers who placed more than one order."
+    type: simple
+    type_params:
+      measure:
+        name: repeat_customer_count
+
+  - name: repeat_purchase_rate
+    label: "Repeat Purchase Rate"
+    description: "Percentage of customers who placed more than one order."
+    type: ratio
+    type_params:
+      numerator: repeat_customer_count
+      denominator: customer_count
+
+  - name: conversion_rate
+    label: "Conversion Rate"
+    description: "Percentage of orders that were successfully delivered."
+    type: ratio
+    type_params:
+      numerator: order_count
+      denominator: order_count
+
+  - name: late_delivery_rate
+    label: "Late Delivery Rate"
+    description: "Percentage of delivered orders that arrived after the estimated date."
+    type: ratio
+    type_params:
+      numerator: order_count
+      denominator: order_count
