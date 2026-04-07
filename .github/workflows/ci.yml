@@ -1,0 +1,54 @@
+name: dbt CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  dbt-build:
+    name: dbt build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+        with:
+          version: latest
+          virtualenvs-create: true
+          virtualenvs-in-project: true
+
+      - name: Install dependencies
+        run: poetry install --no-interaction
+
+      - name: Set up dbt profiles
+        run: |
+          mkdir -p ~/.dbt
+          cat <<EOF > ~/.dbt/profiles.yml
+          olist_metrics:
+            outputs:
+              prod:
+                type: bigquery
+                method: service_account
+                project: ${{ secrets.GCP_PROJECT_ID }}
+                dataset: olist_prod
+                location: europe-west1
+                threads: 4
+                keyfile_json: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
+            target: prod
+          EOF
+
+      - name: dbt build
+        working-directory: olist_metrics
+        run: poetry run dbt build --target prod
