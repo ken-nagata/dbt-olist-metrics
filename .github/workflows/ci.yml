@@ -40,7 +40,7 @@ jobs:
             outputs:
               prod:
                 type: bigquery
-                method: service_account
+                method: service-account-json
                 project: ${{ secrets.GCP_PROJECT_ID }}
                 dataset: olist_prod
                 location: europe-west1
