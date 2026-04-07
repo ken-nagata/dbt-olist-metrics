@@ -49,6 +49,10 @@ jobs:
             target: prod
           EOF
 
+      - name: dbt deps
+        working-directory: olist_metrics
+        run: poetry run dbt deps
+
       - name: dbt build
         working-directory: olist_metrics
         run: poetry run dbt build --target prod
