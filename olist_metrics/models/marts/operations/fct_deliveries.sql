@@ -1,5 +1,24 @@
+{{
+    config(
+        materialized='incremental',
+        unique_key='order_id',
+        incremental_strategy='merge',
+        partition_by={
+            'field': 'order_purchase_timestamp',
+            'data_type': 'datetime',
+            'granularity': 'day'
+        },
+        cluster_by=['delivery_status', 'customer_state', 'order_status']
+    )
+}}
+
 with orders as (
     select * from {{ ref('fct_orders') }}
+    {% if is_incremental() %}
+    where order_purchase_timestamp > (
+        select date_sub(max(order_purchase_timestamp), interval 90 day) from {{ this }}
+    )
+    {% endif %}
 ),
 
 final as (

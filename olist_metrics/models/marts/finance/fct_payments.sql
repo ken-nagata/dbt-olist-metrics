@@ -1,9 +1,28 @@
+{{
+    config(
+        materialized='incremental',
+        unique_key=['order_id', 'payment_sequential'],
+        incremental_strategy='merge',
+        partition_by={
+            'field': 'order_date',
+            'data_type': 'date',
+            'granularity': 'day'
+        },
+        cluster_by=['customer_state', 'payment_type']
+    )
+}}
+
 with payments as (
     select * from {{ ref('stg_order_payments') }}
 ),
 
 orders as (
     select * from {{ ref('fct_orders') }}
+    {% if is_incremental() %}
+    where order_purchase_timestamp > (
+        select date_sub(max(order_date), interval 90 day) from {{ this }}
+    )
+    {% endif %}
 ),
 
 final as (

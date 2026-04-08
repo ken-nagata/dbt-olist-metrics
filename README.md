@@ -137,6 +137,19 @@ All staging models are materialized as **views**. Transformations applied:
 
 ---
 
+## Incremental Models & Performance
+
+Four high-volume fact tables use incremental materialization with a 90-day lookback window to capture late-arriving data (status updates, reviews, delivery timestamps):
+
+| Model | Partition | Cluster |
+|---|---|---|
+| `fct_orders` | `order_purchase_timestamp` (day) | `customer_state`, `order_status`, `delivery_status` |
+| `fct_revenue` | `order_date` (day) | `customer_state`, `order_status` |
+| `fct_deliveries` | `order_purchase_timestamp` (day) | `delivery_status`, `customer_state`, `order_status` |
+| `fct_payments` | `order_date` (day) | `customer_state`, `payment_type` |
+
+First run requires `--full-refresh` to apply partition and cluster configuration. Subsequent runs merge only the last 90 days.
+
 ## Metrics Defined
 
 Metrics are defined using MetricFlow on top of the marts layer.
