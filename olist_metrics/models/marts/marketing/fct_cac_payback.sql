@@ -27,7 +27,7 @@ new_customers as (
         round(avg(orders.total_payment_value), 2)                            as avg_first_order_value
     from customer_orders
     inner join orders
-        on customer_orders.customer_id = orders.customer_id
+        on customer_orders.customer_id = orders.customer_unique_id
         and date(orders.order_purchase_timestamp) = date(customer_orders.first_order_date)
     group by 1
 ),

@@ -6,7 +6,8 @@ final as (
     select 
         -- keys 
         order_id,
-        customer_id,
+        customer_id,                    -- Olist surrogate, kept for joins
+        customer_unique_id,             -- true customer identifier
         customer_city,
         customer_state,
         customer_zip_code_prefix,
