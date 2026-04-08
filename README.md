@@ -20,60 +20,40 @@ A production-style e-commerce metrics layer built with dbt and BigQuery on the [
 
 ## Architecture
 
-Raw CSVs (Kaggle)
-│
-▼
-Python Ingestion Script (scripts/load_to_bq.py)
-│
-▼
-BigQuery: olist_raw (9 source tables)
-│
-▼
-dbt Staging Layer (views) — renaming, casting, lowercasing
-│
-▼
-dbt Intermediate Layer (views) — joins, aggregations, derived fields
-│
-▼
-dbt Marts Layer (tables) — domain-specific fact and dimension tables
-│
-▼
-MetricFlow Semantic Layer — metric definitions on top of marts
-│
-▼
-Metabase Dashboards (self-hosted via Docker)
+1. **Raw CSVs** (Kaggle) → downloaded manually into `data/`
+2. **Python ingestion** (`scripts/load_to_bq.py`) → loads to `olist_raw` in BigQuery
+3. **dbt Staging** → views with renaming, casting, timezone conversion
+4. **dbt Intermediate** → joins, aggregations, derived fields
+5. **dbt Marts** → domain fact and dimension tables materialized as tables
+6. **MetricFlow** → semantic layer with metric definitions
+7. **Metabase** → self-hosted dashboards via Docker on `olist_prod`
 
 ---
 
 ## Project Structure
-
+```
 dbt-olist-metrics/
-├── .github/
-│   └── workflows/
-│       └── ci.yml                  # GitHub Actions CI pipeline
-├── docs/
-│   └── screenshots/                # Metabase dashboard screenshots
-├── olist_metrics/                  # dbt project
+├── .github/workflows/ci.yml
+├── docs/screenshots/
+├── olist_metrics/
 │   ├── models/
-│   │   ├── staging/                # 9 staging models (stg_)
-│   │   ├── intermediate/           # 6 intermediate models (int_)
+│   │   ├── staging/
+│   │   ├── intermediate/
 │   │   ├── marts/
-│   │   │   ├── core/               # fct_orders, dim_customers, dim_products
-│   │   │   ├── finance/            # fct_revenue, fct_payments
-│   │   │   ├── marketing/          # fct_customer_orders, fct_cac_payback
-│   │   │   ├── operations/         # fct_deliveries, fct_seller_performance
-│   │   │   ├── product/            # fct_category_performance, fct_order_reviews, fct_product_reviews
-│   │   │   └── ml/                 # fct_customer_features, fct_order_features, fct_product_features
-│   │   └── metrics/                # MetricFlow semantic models and metric definitions
-│   ├── tests/                      # Singular tests
-│   ├── seeds/                      # marketing_spend.csv (synthetic)
-│   ├── macros/
+│   │   │   ├── core/
+│   │   │   ├── finance/
+│   │   │   ├── marketing/
+│   │   │   ├── operations/
+│   │   │   ├── product/
+│   │   │   └── ml/
+│   │   └── metrics/
+│   ├── tests/
+│   ├── seeds/
 │   └── dbt_project.yml
-├── scripts/
-│   └── load_to_bq.py               # CSV ingestion script
-├── docker-compose.yml              # Metabase self-hosted setup
-├── pyproject.toml
-└── README.md
+├── scripts/load_to_bq.py
+├── docker-compose.yml
+└── pyproject.toml
+```
 
 ---
 
